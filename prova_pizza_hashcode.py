@@ -7,7 +7,7 @@ file_c = './c_many_ingredients.in'
 file_d = './d_many_pizzas.in'
 file_e = './e_many_teams.in'
 
-@wrap_solution(file_d)
+@wrap_solution(file_b)
 def first_solution(obj: Input) -> Output:
     deliveries: List[Delivery] = [] # contains list of pizza list where the pizza are specified by an int.
     unavail_pizzas: Set[int] = set()
@@ -15,7 +15,6 @@ def first_solution(obj: Input) -> Output:
     teams: Dict[int:int] = obj.teams.copy()
     tot_pizzas = obj.total_pizzas
     total_ingredients: Set[str] = set()
-
 
     int_top={}
     pizzas=[]
@@ -37,20 +36,13 @@ def first_solution(obj: Input) -> Output:
     r=0
     while max_team > 0:
         # Select largest team that can be served
-        if tot_pizzas >= 4 and teams[4] > 0:
-            max_team = 4
-        elif tot_pizzas >= 3 and teams[3] > 0:
-            max_team = 3
-        elif tot_pizzas >= 2 and teams[2] > 0:
-            max_team = 2
-        else:
-            max_team = -1
+        max_team=-1
+        for t in reversed(range(2,5)):
+            if len(pizzas)>=t and teams[t]>0:max_team=t;break
 
         # No team can be served --> no delivery / no further choice
         if max_team < 0:
             break
-
-        teams[max_team] -= 1
 
         # Until there aren't enough pizzas for everyone in the team
         current_pizza: List[int] = []
@@ -75,14 +67,15 @@ def first_solution(obj: Input) -> Output:
                     best_pizza = pizza
                     max_ingredients = diff_ingredients
 
+            if max_ingredients==0 and len(current_pizza)>=2 and teams[len(current_pizza)]>=0:
+                break
             # Update remaining pizzas
-            tot_pizzas -= 1
             del pizzas[ID]#=(True,best_pizza_id,best_pizza)
             unavail_pizzas.add(best_pizza_id)
             current_pizza.append(best_pizza_id)
             current_ingredients = current_ingredients.union(best_pizza)
             total_ingredients = total_ingredients.union(best_pizza)
-
+        teams[len(current_pizza)] -= 1
         d: Delivery = Delivery(len(current_pizza), current_pizza)
         deliveries.append(d)
 
