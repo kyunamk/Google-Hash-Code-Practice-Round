@@ -10,10 +10,8 @@ file_e = './e_many_teams.in'
 @wrap_solution(file_b)
 def first_solution(obj: Input) -> Output:
     deliveries: List[Delivery] = [] # contains list of pizza list where the pizza are specified by an int.
-    unavail_pizzas: Set[int] = set()
     max_team: int = 4
     teams: Dict[int:int] = obj.teams.copy()
-    tot_pizzas = obj.total_pizzas
     total_ingredients: Set[str] = set()
 
     int_top={}
@@ -37,7 +35,7 @@ def first_solution(obj: Input) -> Output:
     while max_team > 0:
         # Select largest team that can be served
         max_team=-1
-        for t in reversed(range(2,5)):
+        for t in [4,3,2]:
             if len(pizzas)>=t and teams[t]>0:max_team=t;break
 
         # No team can be served --> no delivery / no further choice
@@ -67,11 +65,10 @@ def first_solution(obj: Input) -> Output:
                     best_pizza = pizza
                     max_ingredients = diff_ingredients
 
-            if max_ingredients==0 and len(current_pizza)>=2 and teams[len(current_pizza)]>=0:
+            if max_ingredients==0 and len(current_pizza)>=2 and teams[len(current_pizza)]>0:
                 break
             # Update remaining pizzas
             del pizzas[ID]#=(True,best_pizza_id,best_pizza)
-            unavail_pizzas.add(best_pizza_id)
             current_pizza.append(best_pizza_id)
             current_ingredients = current_ingredients.union(best_pizza)
             total_ingredients = total_ingredients.union(best_pizza)
