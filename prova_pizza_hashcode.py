@@ -16,6 +16,25 @@ def first_solution(obj: Input) -> Output:
     tot_pizzas = obj.total_pizzas
     total_ingredients: Set[str] = set()
 
+
+    int_top={}
+    pizzas=[]
+    toppings: Set[int] = set()
+
+    for id_pizza, pizza in enumerate(obj.pizzas):
+        p: Set[int] = set()
+        for t in pizza:
+            if not t in int_top:
+                int_top[t]=len(int_top)
+            p.add(int_top[t])
+
+        toppings.update(p)
+        pizzas+=[(len(p),id_pizza,p)]
+    pizzas.sort(key=lambda a:a[0],reverse=True)
+    # print(pizzas)
+    max_top=len(int_top)
+    print(max_top)
+    r=0
     while max_team > 0:
         # Select largest team that can be served
         if tot_pizzas >= 4 and teams[4] > 0:
@@ -42,20 +61,23 @@ def first_solution(obj: Input) -> Output:
             max_ingredients = -1
 
             # Find the most stacked out pizza
-            for id_pizza, pizza in enumerate(obj.pizzas):
-                # Skip unavailable pizzas
-                if id_pizza in unavail_pizzas:
-                    continue
+            for z,_pizza in enumerate(pizzas):
+                if _pizza[0]<=max_ingredients:
+                    break
+                id_pizza=_pizza[1]
+                pizza=_pizza[2]
 
                 # Most different ingredients
                 diff_ingredients: int = len(pizza.difference(current_ingredients))
-                if diff_ingredients > max_ingredients:
+                if diff_ingredients >= max_ingredients:
+                    ID=z
                     best_pizza_id = id_pizza
                     best_pizza = pizza
                     max_ingredients = diff_ingredients
 
             # Update remaining pizzas
             tot_pizzas -= 1
+            del pizzas[ID]#=(True,best_pizza_id,best_pizza)
             unavail_pizzas.add(best_pizza_id)
             current_pizza.append(best_pizza_id)
             current_ingredients = current_ingredients.union(best_pizza)
@@ -64,5 +86,8 @@ def first_solution(obj: Input) -> Output:
         d: Delivery = Delivery(len(current_pizza), current_pizza)
         deliveries.append(d)
 
+        r+=len(current_ingredients)**2
+        print(r, len(current_ingredients))
+    print(len(total_ingredients),r )
     return Output(deliveries)
 
